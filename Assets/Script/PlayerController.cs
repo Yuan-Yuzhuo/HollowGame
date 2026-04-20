@@ -17,7 +17,12 @@ public class PlayerController : MonoBehaviour
     public float coyoteTime = 0.1f;
     private float coyoteTimer;
 
-    public float fallThreshold = -500f;
+    // 攻击相关
+    public Transform attackPoint;
+    public float attackRange = 1f;
+    public LayerMask enemyLayer;
+
+    public float fallThreshold = -20f;
 
     void Start()
     {
@@ -48,7 +53,7 @@ public class PlayerController : MonoBehaviour
             // 第二次跳：力度减半
             if (jumpCount == 1)
             {
-                currentJumpForce = jumpForce * 0.8f;
+                currentJumpForce = jumpForce * 0.6f;
             }
 
             rb.velocity = new Vector2(rb.velocity.x, 0f);
@@ -60,11 +65,41 @@ public class PlayerController : MonoBehaviour
             coyoteTimer = 0;
         }
 
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Attack();
+        }
+
         // 掉落死亡检测
         if (transform.position.y < fallThreshold)
         {
             Die();
         }
+
+    }
+
+    void Attack()
+    {
+        //Debug.Log("Mouse Clicked!");
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
+            attackPoint.position,
+            attackRange,
+            enemyLayer
+        );
+
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            Destroy(enemy.gameObject);
+        }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (attackPoint == null) return;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPoint.position, attackRange);
     }
 
     void Die()
@@ -82,6 +117,21 @@ public class PlayerController : MonoBehaviour
         {
             isGrounded = true;
             jumpCount = 0;
+        }
+
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            if (rb.velocity.y < 0 && transform.position.y > collision.transform.position.y)
+            {
+                Destroy(collision.gameObject);
+
+                rb.velocity = new Vector2(rb.velocity.x, 0f);
+                rb.AddForce(Vector2.up * jumpForce * 0.7f, ForceMode2D.Impulse);
+            }
+            else
+            {
+                Die();
+            }
         }
     }
 
