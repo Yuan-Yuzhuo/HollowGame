@@ -8,4 +8,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/Hurdle2.unity
+    guid: e8f18d83c061b5f4a99e8500b3ca8223
+  - enabled: 1
+    path: Assets/Scenes/Hurdle3.unity
+    guid: 214a86a18b50bf04cbfd24c812849b0a
+  - enabled: 1
+    path: Assets/Scenes/Hurdle4.unity
+    guid: eb146d995d78c0940aaaa4ff7a298e82
+  - enabled: 1
+    path: Assets/Scenes/Hurdle5.unity
+    guid: 26ae72b1c68e3c644a34ab6a6b17bfe4
   m_configObjects: {}
