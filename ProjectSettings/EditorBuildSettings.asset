@@ -6,18 +6,21 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/1.Beginning.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
     path: Assets/Scenes/Hurdle2.unity
     guid: e8f18d83c061b5f4a99e8500b3ca8223
   - enabled: 1
-    path: Assets/Scenes/Hurdle3.unity
+    path: Assets/Scenes/2.MovingSpike.unity
     guid: 214a86a18b50bf04cbfd24c812849b0a
   - enabled: 1
-    path: Assets/Scenes/Hurdle4.unity
+    path: Assets/Scenes/3.3MovingSpkies.unity
     guid: eb146d995d78c0940aaaa4ff7a298e82
   - enabled: 1
-    path: Assets/Scenes/Hurdle5.unity
+    path: Assets/Scenes/4.2MovingSpikes.unity
     guid: 26ae72b1c68e3c644a34ab6a6b17bfe4
+  - enabled: 1
+    path: Assets/Scenes/5.ChasingSpikes.unity
+    guid: 50b057c0c8ab0204c9f9568bd89e88c0
   m_configObjects: {}
