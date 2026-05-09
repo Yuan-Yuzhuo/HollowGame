@@ -55,8 +55,12 @@ public class PlayerController : MonoBehaviour
     private int currentHealth;
     private bool isInvincible = false;
     private float invincibleTimer = 0f;
-    private SpriteRenderer spriteRenderer;
-    private Animator animator;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Animator animator;
+    [SerializeField] private Transform visualRoot;
+
+    private int facingDir = 1;
+    private Vector3 attackPointStartLocalPos;
 
     // 反馈
     public ParticleSystem landParticles;
@@ -80,14 +84,61 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        animator = GetComponent<Animator>();
+
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        }
+
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
+        }
+
+        if (visualRoot == null && spriteRenderer != null)
+        {
+            visualRoot = spriteRenderer.transform;
+        }
+
+        if (attackPoint != null)
+        {
+            attackPointStartLocalPos = attackPoint.localPosition;
+        }
+
         currentHealth = maxHealth;
         defaultGravityScale = rb.gravityScale;
+
         if (cameraFollow == null && Camera.main != null)
         {
             cameraFollow = Camera.main.GetComponent<CameraFollow>();
         }
+    }
+
+    void SetFacing(int dir)
+    {
+        if (dir == facingDir) return;
+
+        facingDir = dir;
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.flipX = facingDir < 0;
+        }
+
+        if (attackPoint != null)
+        {
+            Vector3 p = attackPointStartLocalPos;
+            p.x = Mathf.Abs(p.x) * facingDir;
+            attackPoint.localPosition = p;
+        }
+    }
+
+    void UpdateAnimParams(float move)
+    {
+        if (animator == null) return;
+
+
+        animator.SetBool("Grounded", isGrounded);
     }
 
     void Update()
@@ -121,6 +172,18 @@ public class PlayerController : MonoBehaviour
 
         // 左右移动
         float move = Input.GetAxisRaw("Horizontal");
+        if (animator != null)
+        {
+            animator.SetFloat("Speed", Mathf.Abs(move));
+            animator.SetBool("Grounded", isGrounded);
+        }
+        animator.SetFloat("Speed", Mathf.Abs(move));
+        if (Mathf.Abs(move) > 0.01f)
+        {
+            SetFacing(move > 0 ? 1 : -1);
+        }
+
+        UpdateAnimParams(move);
         if (!isDashing)
         {
             float targetSpeed = move * speed;
@@ -225,7 +288,7 @@ public class PlayerController : MonoBehaviour
         {
             GameObject fx = Instantiate(attackFxPrefab, attackPoint.position, Quaternion.identity);
             Vector3 scale = fx.transform.localScale;
-            scale.x = transform.localScale.x >= 0f ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
+            scale.x = facingDir >= 0 ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
             fx.transform.localScale = scale;
             Destroy(fx, attackFxDuration);
         }
@@ -313,7 +376,7 @@ public class PlayerController : MonoBehaviour
         dashTimer = dashTime;
         dashCooldownTimer = dashCooldown;
         rb.gravityScale = 0f;
-        dashDir = inputDir != 0f ? (int)Mathf.Sign(inputDir) : (transform.localScale.x >= 0f ? 1 : -1);
+        dashDir = inputDir != 0f ? (int)Mathf.Sign(inputDir) : facingDir;
 
         if (!isGrounded)
         {
