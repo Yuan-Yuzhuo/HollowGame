@@ -26,4 +26,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/6.Coin.unity
     guid: bf3f9a278cd24ae48b41052759f5c743
+  - enabled: 1
+    path: Assets/Scenes/7.TrapCoin.unity
+    guid: c740c45a63482ac4f9ea1d28a07487e9
+  - enabled: 1
+    path: Assets/Scenes/8.maze.unity
+    guid: 0ad411dcd1bda8242a4c5a5b5512ea87
   m_configObjects: {}

@@ -81,36 +81,45 @@ public class PlayerController : MonoBehaviour
     // 重生点
     public Transform respawnPoint;
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
 
         if (spriteRenderer == null)
-        {
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        }
 
         if (animator == null)
-        {
             animator = GetComponentInChildren<Animator>();
-        }
+        
+        animator.enabled = true;
 
         if (visualRoot == null && spriteRenderer != null)
-        {
             visualRoot = spriteRenderer.transform;
-        }
 
         if (attackPoint != null)
-        {
             attackPointStartLocalPos = attackPoint.localPosition;
-        }
+    }
 
+    void Start()
+    {
         currentHealth = maxHealth;
         defaultGravityScale = rb.gravityScale;
+
+        isDead = false;
+        isDashing = false;
+        isInvincible = false;
 
         if (cameraFollow == null && Camera.main != null)
         {
             cameraFollow = Camera.main.GetComponent<CameraFollow>();
+        }
+
+        if (animator != null)
+        {
+            animator.Rebind();
+            animator.Update(0f);
+            animator.enabled = true;
+            animator.Play("Idle", 0, 0f);
         }
     }
 
@@ -320,16 +329,9 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-
-        if (isDead) return; 
+        if (isDead) return;
 
         isDead = true;
-        // 重生到重生点
-        if (respawnPoint != null)
-        {
-            transform.position = respawnPoint.position;
-        }
-        currentHealth = maxHealth;
         StartCoroutine(RestartAsync());
     }
 
@@ -428,19 +430,6 @@ public class PlayerController : MonoBehaviour
             }
 
 
-            // 只有在没有配置 groundCheck 的情况下，使用碰撞回调触发落地反馈（作为后备）
-            if (groundCheck == null)
-            {
-                if (!wasGroundedBefore && (wasFalling || hasUpContact) && Time.time - lastLandTime > landCooldown)
-                {
-                    lastLandTime = Time.time;
-#if UNITY_EDITOR
-                    Debug.Log($"Player LandFeedback triggered (wasFalling={wasFalling}, hasUpContact={hasUpContact}, colId={colId}, groundCount={groundColliderIds.Count})");
-#endif
-                    LandFeedback();
-                }
-            }
-
             isGrounded = groundColliderIds.Count > 0;
             jumpCount = 0;
             canAirDash = true;
@@ -511,15 +500,7 @@ public class PlayerController : MonoBehaviour
             Collider2D hit = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
             nowGrounded = hit != null;
 
-            // 仅在 0 -> 1 转换时触发落地反馈
-            if (!prevGroundedState && nowGrounded && Time.time - lastLandTime > landCooldown)
-            {
-                lastLandTime = Time.time;
-#if UNITY_EDITOR
-                Debug.Log($"Player LandFeedback via OverlapCircle triggered (prevGrounded={prevGroundedState}, nowGrounded={nowGrounded})");
-#endif
-                LandFeedback();
-            }
+
 
             prevGroundedState = nowGrounded;
             isGrounded = nowGrounded;
@@ -535,7 +516,7 @@ public class PlayerController : MonoBehaviour
 #if UNITY_EDITOR
                 Debug.Log($"Player LandFeedback via collider-set triggered (prevGrounded={prevGroundedState}, groundCount={groundColliderIds.Count})");
 #endif
-                LandFeedback();
+
             }
             prevGroundedState = nowGrounded;
             isGrounded = nowGrounded;
@@ -584,19 +565,4 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void LandFeedback()
-    {
-        if (animator != null)
-        {
-            animator.SetTrigger("Land");
-        }
-        if (landParticles != null)
-        {
-            landParticles.Play();
-        }
-        if (cameraFollow != null)
-        {
-            cameraFollow.Shake(landShakeDuration, landShakeMagnitude);
-        }
-    }
 }
