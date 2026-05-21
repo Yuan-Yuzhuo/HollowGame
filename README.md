@@ -72,11 +72,13 @@ Balancing platform timing and collision behavior may cause gameplay bugs or inco
 # Sprites
 Character sprite: Simple 2D Platformer Assets Pack
 https://assetstore.unity.com/packages/2d/characters/simple-2d-platformer-assets-pack-188518
+
 Platform tiles: AssetStore
 https://assetstore.unity.com/
 
 Coin sprite: 2D Animated Coin - 2D RPK
 https://assetstore.unity.com/packages/2d/environments/2d-animated-coin-2d-rpk-22009
+
 Platform tiles: AssetStore
 https://assetstore.unity.com/
 
